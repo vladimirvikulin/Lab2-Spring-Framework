@@ -4,6 +4,8 @@ import com.example.newsapp.model.News;
 import com.example.newsapp.model.Category;
 import com.example.newsapp.service.NewsService;
 import com.example.newsapp.service.CategoryService;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +19,7 @@ public class NewsController {
     private final NewsService newsService;
     private final CategoryService categoryService;
 
+    @Autowired //DI constructor
     public NewsController(NewsService newsService, CategoryService categoryService) {
         this.newsService = newsService;
         this.categoryService = categoryService;
