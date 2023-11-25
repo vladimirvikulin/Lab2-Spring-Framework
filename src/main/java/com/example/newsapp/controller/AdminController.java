@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -36,40 +37,44 @@ public class AdminController {
         return "admin";
     }
 
-    @GetMapping("/admin/createNews")
-    public String createNewsForm(Model model) {
+    @GetMapping("/admin/createForm")
+    public String createForm(@RequestParam String formType, Model model) {
         List<Category> categories = categoryService.getAllCategories();
-        model.addAttribute("categories", categories);
-        model.addAttribute("news", new News());
-        return "createNewsForm";
+        switch (formType) {
+            case "news":
+                model.addAttribute("categories", categories);
+                model.addAttribute("news", new News());
+                break;
+            case "category":
+                model.addAttribute("category", new Category());
+                break;
+            default:
+                break;
+        }
+        model.addAttribute("formType", formType);
+        return "createForm";
     }
 
     @PostMapping("/admin/createNews")
     public String createNews(@ModelAttribute News news) {
         newsService.createNews(news);
-        return "redirect:/admin";
-    }
-
-    @GetMapping("/admin/createCategory")
-    public String createCategoryForm(Model model) {
-        model.addAttribute("category", new Category());
-        return "createCategoryForm";
+        return "redirect:/";
     }
 
     @PostMapping("/admin/createCategory")
     public String createCategory(@ModelAttribute Category category) {
         categoryService.createCategory(category);
-        return "redirect:/admin";
+        return "redirect:/";
     }
     @PostMapping("/admin/deleteNews/{id}")
     public String deleteNews(@PathVariable Long id) {
         newsService.deleteNewsById(id);
-        return "redirect:/admin";
+        return "redirect:/";
     }
 
     @PostMapping("/admin/deleteCategory/{id}")
     public String deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategoryById(id);
-        return "redirect:/admin";
+        return "redirect:/";
     }
 }
