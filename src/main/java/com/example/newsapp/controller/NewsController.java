@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.List;
 public class NewsController {
     private final NewsService newsService;
     private final CategoryService categoryService;
+    private boolean isAdmin = false;
 
     @Autowired //DI constructor
     public NewsController(NewsService newsService, CategoryService categoryService) {
@@ -31,6 +33,7 @@ public class NewsController {
         model.addAttribute("news", allNews);
         List<Category> allCategories = categoryService.getAllCategories();
         model.addAttribute("categories", allCategories);
+        model.addAttribute("isAdmin", isAdmin);
         return "home";
     }
 
@@ -53,5 +56,12 @@ public class NewsController {
         List<News> news = newsService.searchNews(keyword);
         model.addAttribute("news", news);
         return "home";
+    }
+
+    @GetMapping("/changeStatus")
+    public String changeUserStatus(Model model) {
+        isAdmin = !isAdmin;
+        model.addAttribute("isAdmin", isAdmin);
+        return "redirect:/";
     }
 }
