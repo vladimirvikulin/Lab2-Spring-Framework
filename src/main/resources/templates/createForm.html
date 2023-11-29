@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Create Category</title>
+    <title th:text="${formType == 'category' ? 'Create Category' : 'Create News'}">Create Category</title>
 </head>
 <body>
     <div th:switch="${formType}">
