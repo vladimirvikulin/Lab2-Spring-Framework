@@ -14,8 +14,11 @@
         <li th:each="news : ${news}">
             <a th:href="'/news/' + ${news.id}" th:text="${news.title}"></a>
             <div th:if="${isAdmin}">
-                <form th:action="@{/admin/deleteNews/{id}(id=${news.id})}" method="post">
+                <form th:action="@{/admin/deleteNews/{id}(id=${news.id})}" th:method="delete">
                     <button type="submit">Delete</button>
+                </form>
+                <form th:action="@{/admin/editNews/{id}(id=${news.id})}" th:method="get">
+                    <button type="submit">Edit</button>
                 </form>
             </div>
         </li>
@@ -26,7 +29,7 @@
         <li th:each="category : ${categories}">
             <a th:href="'/news/category/' + ${category.id}" th:text="${category.name}"></a>
             <div th:if="${isAdmin}">
-                <form th:action="@{/admin/deleteCategory/{id}(id=${category.id})}" method="post">
+                <form th:action="@{/admin/deleteCategory/{id}(id=${category.id})}" th:method="delete">
                     <button type="submit">Delete</button>
                 </form>
             </div>

@@ -10,8 +10,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -66,15 +68,30 @@ public class AdminController {
         categoryService.createCategory(category);
         return "redirect:/";
     }
-    @PostMapping("/admin/deleteNews/{id}")
+    @DeleteMapping("/admin/deleteNews/{id}")
     public String deleteNews(@PathVariable Long id) {
         newsService.deleteNewsById(id);
         return "redirect:/";
     }
 
-    @PostMapping("/admin/deleteCategory/{id}")
+    @DeleteMapping("/admin/deleteCategory/{id}")
     public String deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategoryById(id);
+        return "redirect:/";
+    }
+
+    @GetMapping("/admin/editNews/{id}")
+    public String editNewsForm(@PathVariable Long id, Model model) {
+        News news = newsService.getNewsById(id);
+        model.addAttribute("news", news);
+        model.addAttribute("categories", categoryService.getAllCategories());
+        return "editNews";
+    }
+
+    @PutMapping("/admin/editNews/{id}")
+    public String editNews(@PathVariable Long id, @ModelAttribute News updatedNews) {
+        updatedNews.setId(id);
+        newsService.editNews(updatedNews);
         return "redirect:/";
     }
 }

@@ -50,4 +50,15 @@ public class NewsService {
     public void deleteNewsById(Long id) {
         newsRepository.deleteById(id);
     }
+
+    public void editNews(News updatedNews) {
+        Category category = updatedNews.getCategory();
+        if (category.getId() == null) {
+            category = categoryService.createCategory(category);
+        }
+        updatedNews.setCategory(category);
+
+        newsRepository.save(updatedNews);
+    }
+
 }
