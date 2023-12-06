@@ -8,7 +8,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Service
@@ -19,8 +19,6 @@ public class NewsService {
     public NewsService(NewsRepository newsRepository, CategoryService categoryService) {
         this.newsRepository = newsRepository;
         this.categoryService = categoryService;
-
-
     }
 
     public Page<News> getAllNews(int page, int size) {
@@ -32,8 +30,8 @@ public class NewsService {
         return newsRepository.findById(id);
     }
 
-    public Page<News> getNewsByCategoryId(Long categoryId, int page, int size) {
-        Optional<Category> category = categoryService.getCategoryById(categoryId);
+    public Page<News> getNewsByCategoryId(Long id, int page, int size) {
+        Optional<Category> category = categoryService.getCategoryById(id);
         Pageable pageable = PageRequest.of(page, size);
         return newsRepository.findByCategory(category.orElseThrow(), pageable);
     }
@@ -43,28 +41,38 @@ public class NewsService {
         return newsRepository.findByTitleContaining(keyword, pageable);
     }
 
-    /* public void createNews(News news) {
-        Category category = news.getCategory();
-        if (category.getId() == null) {
-            category = categoryService.createCategory(category);
+    public News saveNews(Long id, String title, String content, LocalDate date, Optional<Category> category) {
+        if (title.isBlank() || content.isBlank() || date == null) {
+            throw new IllegalArgumentException("Expected not blank fields");
         }
-        news.setCategory(category);
 
-        newsRepository.save(news);
-    } */
-    
-    public void deleteNewsById(Long id) {
-        newsRepository.deleteById(id);
+        LocalDate currentDate = LocalDate.now();
+        if (date.isAfter(currentDate)) {
+            throw new IllegalArgumentException("Date should be in the past");
+        }
+
+        if (category.isEmpty()) {
+            throw new IllegalArgumentException("Category not found");
+        }
+
+        News news = new News();
+        news.setTitle(title);
+        news.setContent(content);
+        news.setDate(date);
+        news.setCategory(category.get());
+
+        if (id != 0) {
+            news.setId(id);
+        }
+
+        return newsRepository.save(news);
     }
 
-    /* public void editNews(News updatedNews) {
-        Category category = updatedNews.getCategory();
-        if (category.getId() == null) {
-            category = categoryService.createCategory(category);
-        }
-        updatedNews.setCategory(category);
+    public void deleteNews(News news) {
+        newsRepository.delete(news);
+    }
 
-        newsRepository.save(updatedNews);
-    } */
-
+    public boolean exists(Long id) {
+        return newsRepository.existsById(id);
+    }
 }
