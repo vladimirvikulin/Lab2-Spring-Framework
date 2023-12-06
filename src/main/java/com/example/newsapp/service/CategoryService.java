@@ -8,13 +8,12 @@ import com.example.newsapp.repository.NewsRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.Optional;
 
 @Service
 public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final NewsRepository newsRepository;
-    private final AtomicLong idGenerator = new AtomicLong(1);
 
     public CategoryService(CategoryRepository categoryRepository, NewsRepository newsRepository) {
         this.categoryRepository = categoryRepository;
@@ -25,21 +24,22 @@ public class CategoryService {
         return categoryRepository.findAll();
     }
 
-    public Category getCategoryById(Long id) {
+    public Optional<Category> getCategoryById(Long id) {
         return categoryRepository.findById(id);
     }
 
     public Category createCategory(Category category) {
-        category.setId(idGenerator.getAndIncrement());
         return categoryRepository.save(category);
     }
 
     public void deleteCategoryById(Long id) {
-        Category category = getCategoryById(id);
-        categoryRepository.deleteById(id);
-        List<News> newsToDelete = newsRepository.findByCategory(category);
-        for (News news : newsToDelete) {
-            newsRepository.deleteById(news.getId());
+        Optional<Category> category = getCategoryById(id);
+        if(category.isPresent()) {
+            List<News> newsToDelete = newsRepository.findByCategory(category.get());
+            for (News news : newsToDelete) {
+                newsRepository.deleteById(news.getId());
+            }
+            categoryRepository.deleteById(id);
         }
     }
 }

@@ -6,37 +6,23 @@ import com.example.newsapp.service.NewsService;
 import com.example.newsapp.service.CategoryService;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 public class AdminController {
-    @Autowired //DI field
-    private NewsService newsService;
+    private final NewsService newsService;
 
-    private CategoryService categoryService;
+    private final CategoryService categoryService;
 
-    @Autowired //DI setter
-    public void setCategoryService(CategoryService categoryService) {
+    @Autowired
+    public AdminController(NewsService newsService, CategoryService categoryService) {
+        this.newsService = newsService;
         this.categoryService = categoryService;
-    }
-
-    @GetMapping("/admin")
-    public String adminPage(Model model) {
-        List<News> allNews = newsService.getAllNews();
-        model.addAttribute("news", allNews);
-        List<Category> allCategories = categoryService.getAllCategories();
-        model.addAttribute("categories", allCategories);
-        return "admin";
     }
 
     @GetMapping("/admin/createForm")
@@ -82,8 +68,8 @@ public class AdminController {
 
     @GetMapping("/admin/editNews/{id}")
     public String editNewsForm(@PathVariable Long id, Model model) {
-        News news = newsService.getNewsById(id);
-        model.addAttribute("news", news);
+        Optional<News> news = newsService.getNewsById(id);
+        news.ifPresent(value -> model.addAttribute("news", value));
         model.addAttribute("categories", categoryService.getAllCategories());
         return "editNews";
     }
