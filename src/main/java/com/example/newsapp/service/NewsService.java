@@ -43,7 +43,7 @@ public class NewsService {
         return newsRepository.findByTitleContaining(keyword, pageable);
     }
 
-    public void createNews(News news) {
+    /* public void createNews(News news) {
         Category category = news.getCategory();
         if (category.getId() == null) {
             category = categoryService.createCategory(category);
@@ -51,13 +51,13 @@ public class NewsService {
         news.setCategory(category);
 
         newsRepository.save(news);
-    }
+    } */
     
     public void deleteNewsById(Long id) {
         newsRepository.deleteById(id);
     }
 
-    public void editNews(News updatedNews) {
+    /* public void editNews(News updatedNews) {
         Category category = updatedNews.getCategory();
         if (category.getId() == null) {
             category = categoryService.createCategory(category);
@@ -65,6 +65,6 @@ public class NewsService {
         updatedNews.setCategory(category);
 
         newsRepository.save(updatedNews);
-    }
+    } */
 
 }

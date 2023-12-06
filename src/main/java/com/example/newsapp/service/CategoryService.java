@@ -28,18 +28,20 @@ public class CategoryService {
         return categoryRepository.findById(id);
     }
 
-    public Category createCategory(Category category) {
+    public Category createCategory(String name) {
+        Category category = new Category();
+        category.setName(name);
+
         return categoryRepository.save(category);
     }
 
-    public void deleteCategoryById(Long id) {
-        Optional<Category> category = getCategoryById(id);
-        if(category.isPresent()) {
-            List<News> newsToDelete = newsRepository.findByCategory(category.get());
-            for (News news : newsToDelete) {
-                newsRepository.deleteById(news.getId());
-            }
-            categoryRepository.deleteById(id);
-        }
+    public void deleteCategory(Category category) {
+        List<News> news = newsRepository.findByCategory(category);
+        newsRepository.deleteAll(news);
+        categoryRepository.delete(category);
+    }
+
+    public boolean exists(Long id) {
+        return categoryRepository.existsById(id);
     }
 }
