@@ -2,48 +2,16 @@ package com.example.newsapp.repository;
 
 import com.example.newsapp.model.News;
 import com.example.newsapp.model.Category;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
 @Repository
-public class NewsRepository {
-    private final ConcurrentHashMap<Long, News> news = new ConcurrentHashMap<>();
-    private final AtomicLong idGenerator = new AtomicLong(1);
-
-    public News save(News newsItem) {
-        if (newsItem.getId() == null) {
-            newsItem.setId(idGenerator.getAndIncrement());
-        }
-        news.put(newsItem.getId(), newsItem);
-        return newsItem;
-    }
-
-    public News findById(Long id) {
-        return news.get(id);
-    }
-
-    public List<News> findAll() {
-        return new ArrayList<>(news.values());
-    }
-
-    public List<News> findByCategory(Category category) {
-        return news.values().stream()
-                .filter(newsItem -> newsItem.getCategory().getId().equals(category.getId()))
-                .collect(Collectors.toList());
-    }
-
-    public List<News> findByTitleContaining(String keyword) {
-        return news.values().stream()
-                .filter(newsItem -> newsItem.getTitle().contains(keyword))
-                .collect(Collectors.toList());
-    }
-
-    public void deleteById(Long id) {
-        news.remove(id);
-    }
+public interface NewsRepository extends JpaRepository<News, Long> {
+    List<News> findByCategory(Category category);
+    Page<News> findByCategory(Category category, Pageable pageable);
+    Page<News> findByTitleContaining(String keyword, Pageable pageable);
 }

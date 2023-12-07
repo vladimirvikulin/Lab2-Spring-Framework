@@ -11,22 +11,33 @@
         <button type="submit">Search</button>
     </form>
     <ul>
-        <li th:each="news : ${news}">
+        <li th:each="news : ${news.getContent()}">
             <a th:href="'/news/' + ${news.id}" th:text="${news.title}"></a>
             <div th:if="${isAdmin}">
-                <form th:action="@{/admin/deleteNews/{id}(id=${news.id})}" method="post">
+                <form th:action="@{/admin/deleteNews/{id}(id=${news.id})}" th:method="delete">
                     <button type="submit">Delete</button>
+                </form>
+                <form th:action="@{/admin/editNews/{id}(id=${news.id})}" method="get">
+                    <button type="submit">Edit</button>
                 </form>
             </div>
         </li>
     </ul>
 
+    <div th:if="${news.getTotalPages() > 0}" class="pagination"
+         th:each="pageNumber : ${pageNumbers}">
+        <a th:href="@{/(size=${news.size}, page=${pageNumber - 1}, category=${categoryId})}"
+           th:text="${pageNumber}"
+           th:class="${pageNumber==news.number + 1} ? active"></a>
+    </div>
+
     <h1>Categories</h1>
+    <div><a th:href="@{/}" class="add-button">Show All</a></div>
     <ul>
         <li th:each="category : ${categories}">
-            <a th:href="'/news/category/' + ${category.id}" th:text="${category.name}"></a>
+            <a th:href="@{/(category=${category.id})}" th:text="${category.name}"></a>
             <div th:if="${isAdmin}">
-                <form th:action="@{/admin/deleteCategory/{id}(id=${category.id})}" method="post">
+                <form th:action="@{/admin/deleteCategory/{id}(id=${category.id})}" th:method="delete">
                     <button type="submit">Delete</button>
                 </form>
             </div>
