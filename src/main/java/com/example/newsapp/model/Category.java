@@ -8,7 +8,6 @@ import jakarta.persistence.Id;
 @Entity
 public class Category {
     @Id
-    @org.springframework.data.annotation.Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
