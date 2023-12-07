@@ -1,10 +1,21 @@
 package com.example.newsapp.controller.request;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
+
+import java.time.LocalDate;
+
 public class NewsRequest {
+    @NotBlank(message = "Expected any title")
     private String title;
+    @NotBlank(message = "Expected any content")
     private String content;
-    private String date;
-    private String categoryId;
+    @NotNull(message = "Expected any date")
+    @Past(message = "Date should be in the past")
+    private LocalDate date;
+    @NotNull(message = "Expected any category id")
+    private int categoryId;
 
     public void setTitle(String title) {
         this.title = title;
@@ -14,11 +25,11 @@ public class NewsRequest {
         this.content = content;
     }
 
-    public void setDate(String date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
-    public void setCategoryId(String categoryId) {
+    public void setCategoryId(int categoryId) {
         this.categoryId = categoryId;
     }
 
@@ -30,11 +41,11 @@ public class NewsRequest {
         return content;
     }
 
-    public String getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public String getCategoryId() {
-        return categoryId;
+    public Long getCategoryId() {
+        return (long) categoryId;
     }
 }

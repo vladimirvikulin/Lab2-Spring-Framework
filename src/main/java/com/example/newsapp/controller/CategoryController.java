@@ -3,16 +3,16 @@ package com.example.newsapp.controller;
 import com.example.newsapp.controller.request.CategoryRequest;
 import com.example.newsapp.model.Category;
 import com.example.newsapp.service.CategoryService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 
-@Controller
+@RestController
 public class CategoryController {
 
     private final CategoryService categoryService;
@@ -33,15 +33,8 @@ public class CategoryController {
     }
 
     @PostMapping("/category")
-    public ResponseEntity<?> createCategory (@RequestBody CategoryRequest categoryRequest) {
+    public ResponseEntity<?> createCategory (@Valid @RequestBody CategoryRequest categoryRequest) {
         String name = categoryRequest.getName();
-        if (name == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Expected not null name");
-        }
-        if (name.isBlank()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Expected not blank name");
-        }
-
         return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.createCategory(name));
     }
 
@@ -53,11 +46,6 @@ public class CategoryController {
         }
 
         categoryService.deleteCategory(category.get());
-        if (!categoryService.exists(id)) {
-            return ResponseEntity.status(HttpStatus.OK).body("Deleted successfully");
-        }
-        else {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unexpected error");
-        }
+        return ResponseEntity.status(HttpStatus.OK).body("Deleted successfully");
     }
 }

@@ -41,25 +41,12 @@ public class NewsService {
         return newsRepository.findByTitleContaining(keyword, pageable);
     }
 
-    public News saveNews(Long id, String title, String content, LocalDate date, Optional<Category> category) {
-        if (title.isBlank() || content.isBlank() || date == null) {
-            throw new IllegalArgumentException("Expected not blank fields");
-        }
-
-        LocalDate currentDate = LocalDate.now();
-        if (date.isAfter(currentDate)) {
-            throw new IllegalArgumentException("Date should be in the past");
-        }
-
-        if (category.isEmpty()) {
-            throw new IllegalArgumentException("Category not found");
-        }
-
+    public News saveNews(Long id, String title, String content, LocalDate date, Category category) {
         News news = new News();
         news.setTitle(title);
         news.setContent(content);
         news.setDate(date);
-        news.setCategory(category.get());
+        news.setCategory(category);
 
         if (id != 0) {
             news.setId(id);

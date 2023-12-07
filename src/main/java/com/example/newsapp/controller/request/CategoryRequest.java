@@ -1,6 +1,9 @@
 package com.example.newsapp.controller.request;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class CategoryRequest {
+    @NotBlank(message = "Expected any name")
     private String name;
 
     public String getName() {
