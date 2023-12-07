@@ -1,4 +1,4 @@
-package com.example.newsapp.controller.error;
+package com.example.newsapp.error;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
