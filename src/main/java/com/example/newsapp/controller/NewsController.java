@@ -6,6 +6,9 @@ import com.example.newsapp.model.Category;
 import com.example.newsapp.service.NewsService;
 import com.example.newsapp.service.CategoryService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -28,6 +31,14 @@ public class NewsController {
     }
 
     @GetMapping("/news")
+    @Operation(
+            summary = "Get all news",
+            description = "Get one page of all news or error if news were not found"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "404", description = "Not found")
+    })
     public ResponseEntity<?> getAllNews(
             @RequestParam(value = "categoryId", defaultValue = "0", required = false) Long categoryId,
             @RequestParam(value = "page", defaultValue = "0", required = false) int page,
@@ -48,6 +59,14 @@ public class NewsController {
     }
 
     @GetMapping("/news/search")
+    @Operation(
+            summary = "Get news by keyword",
+            description = "Get one page of news which satisfy a keyword or error if news were not found"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "404", description = "Not found")
+    })
     public ResponseEntity<?> getNewsByKeyword(
             @RequestParam(value = "keyword", defaultValue = "", required = false) String keyword,
             @RequestParam(value = "page", defaultValue = "0", required = false) int page,
@@ -65,6 +84,14 @@ public class NewsController {
     }
 
     @GetMapping("/news/{id}")
+    @Operation(
+            summary = "Get a news by ID",
+            description = "Get one news by its ID or error if news was not found"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "404", description = "Not found")
+    })
     public ResponseEntity<?> getNewsById(@PathVariable Long id) {
         Optional<News> news = newsService.getNewsById(id);
         if (news.isEmpty()) {
@@ -88,11 +115,27 @@ public class NewsController {
     }
 
     @PostMapping("/news")
+    @Operation(
+            summary = "Create a news",
+            description = "Create a news and get it or get an error if input is invalid or category was not found"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "404", description = "Not found")
+    })
     public ResponseEntity<?> createNews(@Valid @RequestBody NewsRequest newsRequest) {
         return saveNews(newsRequest, 0L, HttpStatus.CREATED);
     }
 
     @PutMapping("/news/{id}")
+    @Operation(
+            summary = "Update a news",
+            description = "Update a news and get it or get an error if input is invalid or news/category was not found"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "404", description = "Not found")
+    })
     public ResponseEntity<?> updateNews(
             @PathVariable Long id,
             @Valid @RequestBody NewsRequest newsRequest) {
@@ -105,6 +148,14 @@ public class NewsController {
     }
 
     @DeleteMapping("/news/{id}")
+    @Operation(
+            summary = "Delete a news by ID",
+            description = "Delete a news by its ID or get an error if news was not found"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "404", description = "Not found")
+    })
     public ResponseEntity<?> deleteNewsById(@PathVariable Long id) {
         Optional<News> news = newsService.getNewsById(id);
         if (news.isEmpty()) {
