@@ -1,0 +1,447 @@
+openapi: "3.0.3"
+info:
+  title: "Spring Lab 4"
+  description: "Open API"
+  version: "1.0.0"
+paths:
+  /categories:
+    get:
+      summary: "GET categories"
+      description: "Get all categories."
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    id:
+                      type: "integer"
+                      description: "ID of the category"
+                    name:
+                      type: "string"
+                      description: "Name of the category"
+        "404":
+          description: "NOT FOUND"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  error:
+                    type: "string"
+                    description: "Categories were not found"
+  /category:
+    post:
+      summary: "POST category"
+      description: "Create a category and get it."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                name:
+                  type: "string"
+                  description: "Name of the category"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  id:
+                    type: "integer"
+                    description: "ID of the category"
+                  name:
+                    type: "string"
+                    description: "Name of the category"
+        "400":
+          description: "BAD REQUEST"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  error:
+                    type: "string"
+                    description: "Invalid input"
+  /category/{id}:
+    delete:
+      summary: "DELETE category"
+      operationId: "Delete category by its ID"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: "string"
+                    description: "Deleted successfully"
+        "404":
+          description: "NOT FOUND"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  error:
+                    type: "string"
+                    description: "Category was not found"
+  /news:
+    get:
+      summary: "GET news"
+      description: "Get one page from all news."
+      parameters:
+        - name: categoryId
+          in: query
+          description: "Category ID"
+          required: false
+          schema:
+            type: integer
+        - name: page
+          in: query
+          description: "Page number"
+          required: false
+          schema:
+            type: integer
+        - name: size
+          in: query
+          description: "Page size"
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    id:
+                      type: "integer"
+                      description: "ID of the news"
+                    title:
+                      type: "string"
+                      description: "Title of the news"
+                    content:
+                      type: "string"
+                      description: "Content of the news"
+                    date:
+                      type: "string"
+                      description: "Date of the news"
+                    category:
+                      type: "object"
+                      properties:
+                        id:
+                          type: "integer"
+                          description: "ID of the category"
+                        name:
+                          type: "string"
+                          description: "Name of the category"
+        "404":
+          description: "NOT FOUND"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  error:
+                    type: "string"
+                    description: "News/Category were/was not found"
+    post:
+      summary: "POST news"
+      description: "Create a news and get it."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                title:
+                  type: "string"
+                  description: "Title of the news"
+                content:
+                  type: "string"
+                  description: "Content of the news"
+                date:
+                  type: "string"
+                  description: "Date of the news"
+                categoryId:
+                  type: "integer"
+                  description: "ID of the category"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  id:
+                    type: "integer"
+                    description: "ID of the news"
+                  title:
+                    type: "string"
+                    description: "Title of the news"
+                  content:
+                    type: "string"
+                    description: "Content of the news"
+                  date:
+                    type: "string"
+                    description: "Date of the news"
+                  category:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "integer"
+                        description: "ID of the category"
+                      name:
+                        type: "string"
+                        description: "Name of the category"
+        "400":
+          description: "BAD REQUEST"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  error:
+                    type: "string"
+                    description: "Invalid input"
+        "404":
+          description: "NOT FOUND"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  error:
+                    type: "string"
+                    description: "Category was not found"
+  /news/search:
+    get:
+      summary: "GET news by keyword"
+      description: "Get one page of news which satisfy keyword"
+      parameters:
+        - name: keyword
+          in: query
+          description: "Keyword for the request"
+          required: false
+          schema:
+            type: integer
+        - name: page
+          in: query
+          description: "Page number"
+          required: false
+          schema:
+            type: integer
+        - name: size
+          in: query
+          description: "Page size"
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    id:
+                      type: "integer"
+                      description: "ID of the news"
+                    title:
+                      type: "string"
+                      description: "Title of the news"
+                    content:
+                      type: "string"
+                      description: "Content of the news"
+                    date:
+                      type: "string"
+                      description: "Date of the news"
+                    category:
+                      type: "object"
+                      properties:
+                        id:
+                          type: "integer"
+                          description: "ID of the category"
+                        name:
+                          type: "string"
+                          description: "Name of the category"
+        "404":
+          description: "NOT FOUND"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  error:
+                    type: "string"
+                    description: "News were not found"
+  /news/{id}:
+    get:
+      summary: "GET news by ID"
+      description: "Get one news by its ID"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "ID of the news article"
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  id:
+                    type: "integer"
+                    description: "ID of the news"
+                  title:
+                    type: "string"
+                    description: "Title of the news"
+                  content:
+                    type: "string"
+                    description: "Content of the news"
+                  date:
+                    type: "string"
+                    description: "Date of the news"
+                  category:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "integer"
+                        description: "ID of the category"
+                      name:
+                        type: "string"
+                        description: "Name of the category"
+        "404":
+          description: "NOT FOUND"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  error:
+                    type: "string"
+                    description: "News was not found"
+    put:
+      summary: "PUT news by ID"
+      description: "Update a news by its ID and get it"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "ID of the news article"
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                title:
+                  type: "string"
+                  description: "Title of the news"
+                content:
+                  type: "string"
+                  description: "Content of the news"
+                date:
+                  type: "string"
+                  description: "Date of the news"
+                categoryId:
+                  type: "integer"
+                  description: "ID of the category"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  id:
+                    type: "integer"
+                    description: "ID of the news"
+                  title:
+                    type: "string"
+                    description: "Title of the news"
+                  content:
+                    type: "string"
+                    description: "Content of the news"
+                  date:
+                    type: "string"
+                    description: "Date of the news"
+                  category:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "integer"
+                        description: "ID of the category"
+                      name:
+                        type: "string"
+                        description: "Name of the category"
+        "404":
+          description: "NOT FOUND"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  error:
+                    type: "string"
+                    description: "News/Category was not found"
+    delete:
+      summary: "DELETE news by ID"
+      description: "Delete one news by its ID"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "ID of the news article"
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: "string"
+                    description: "Deleted successfully"
+        "404":
+          description: "NOT FOUND"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  error:
+                    type: "string"
+                    description: "News was not found"
