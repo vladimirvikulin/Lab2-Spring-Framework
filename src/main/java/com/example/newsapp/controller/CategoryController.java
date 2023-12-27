@@ -116,7 +116,7 @@ public class CategoryController {
         if (!categoryService.updateCategory(id, name)) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong");
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body("Updated successfully");
+        return ResponseEntity.status(HttpStatus.OK).body("Updated successfully");
     }
 
     @DeleteMapping("/category/{id}")
