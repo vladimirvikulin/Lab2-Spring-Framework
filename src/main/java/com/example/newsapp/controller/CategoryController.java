@@ -1,6 +1,7 @@
 package com.example.newsapp.controller;
 
 import com.example.newsapp.controller.request.CategoryRequest;
+import com.example.newsapp.controller.request.CategoryRequestList;
 import com.example.newsapp.model.Category;
 import com.example.newsapp.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,17 +45,78 @@ public class CategoryController {
         return ResponseEntity.status(HttpStatus.OK).body(categories);
     }
 
+    @GetMapping("/categories/search")
+    @Operation(
+            summary = "Get all categories",
+            description = "Get all categories or error if categories were not found"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "404", description = "Not found")
+    })
+    public ResponseEntity<?> getCategoriesByKeyword(
+            @RequestParam(value = "keyword", defaultValue = "", required = false) String keyword
+    ) {
+        if (keyword.isBlank()) {
+            return getAllCategories();
+        }
+        List<Category> categories = categoryService.getCategoryByKeyword(keyword);
+        if (categories.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Categories not found");
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(categories);
+    }
+
     @PostMapping("/category")
     @Operation(
             summary = "Create a category",
-            description = "Create a category and get it or get an error if input is invalid"
+            description = "Create a category and get its id or get an error if input is invalid"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Created"),
+            @ApiResponse(responseCode = "400", description = "Bad request")
     })
     public ResponseEntity<?> createCategory (@Valid @RequestBody CategoryRequest categoryRequest) {
         String name = categoryRequest.getName();
         return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.createCategory(name));
+    }
+
+    @PostMapping("/categories")
+    @Operation(
+            summary = "Create categories",
+            description = "Create categories and get its ids or get an error if input is invalid"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Created"),
+            @ApiResponse(responseCode = "400", description = "Bad request")
+    })
+    public ResponseEntity<?> createCategories (@Valid @RequestBody CategoryRequestList categoryRequest) {
+        Object[] names = Arrays.stream(categoryRequest.getCategories()).map(CategoryRequest::getName).toArray();
+        return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.createCategories(names));
+    }
+
+    @PutMapping("/category/{id}")
+    @Operation(
+            summary = "Update a category",
+            description = "Update a category or get an error if category was not found"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "400", description = "Bad request")
+    })
+    public ResponseEntity<?> updateCategory (
+            @PathVariable Long id,
+            @Valid @RequestBody CategoryRequest categoryRequest) {
+        Optional<Category> category = categoryService.getCategoryById(id);
+        if (category.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Category not found");
+        }
+        String name = categoryRequest.getName();
+        if (!categoryService.updateCategory(id, name)) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong");
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).body("Updated successfully");
     }
 
     @DeleteMapping("/category/{id}")
@@ -71,7 +134,9 @@ public class CategoryController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Category not found");
         }
 
-        categoryService.deleteCategory(category.get());
+        if (!categoryService.deleteCategory(category.get())) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong");
+        }
         return ResponseEntity.status(HttpStatus.OK).body("Deleted successfully");
     }
 }
