@@ -47,8 +47,8 @@ public class CategoryController {
 
     @GetMapping("/categories/search")
     @Operation(
-            summary = "Get all categories",
-            description = "Get all categories or error if categories were not found"
+            summary = "Get categories by keyword",
+            description = "Get categories which satisfy a keyword or error if categories were not found"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
