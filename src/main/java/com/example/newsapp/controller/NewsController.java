@@ -11,12 +11,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -48,14 +48,14 @@ public class NewsController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Category not found");
         }
 
-        Page<News> news = categoryId == 0 ? newsService.getAllNews(page, size) :
+        List<News> news = categoryId == 0 ? newsService.getAllNews(page, size) :
                     newsService.getNewsByCategoryId(categoryId, page, size);
 
         if (news.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("News not found");
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body(news.getContent());
+        return ResponseEntity.status(HttpStatus.OK).body(news);
     }
 
     @GetMapping("/news/search")
@@ -75,12 +75,12 @@ public class NewsController {
         if (keyword.isBlank()) {
             return getAllNews(0L, page, size);
         }
-        Page<News> news = newsService.searchNews(keyword, page, size);
+        List<News> news = newsService.searchNews(keyword, page, size);
         if (news.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("News not found");
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body(news.getContent());
+        return ResponseEntity.status(HttpStatus.OK).body(news);
     }
 
     @GetMapping("/news/{id}")
@@ -100,7 +100,7 @@ public class NewsController {
         return ResponseEntity.status(HttpStatus.OK).body(news.get());
     }
 
-    private ResponseEntity<?> saveNews(NewsRequest newsRequest, Long id, HttpStatus status) {
+    private ResponseEntity<?> update(NewsRequest newsRequest, Long id, HttpStatus status) {
         String title = newsRequest.getTitle();
         String content = newsRequest.getContent();
         LocalDate date = newsRequest.getDate();
@@ -111,7 +111,15 @@ public class NewsController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Category not found");
         }
 
-        return ResponseEntity.status(status).body(newsService.saveNews(id, title, content, date, category.get()));
+        if (id == 0) {
+            return ResponseEntity.status(status).body(newsService.createNews(title, content, date, category.get()));
+        }
+
+        if (!newsService.updateNews(id, title, content, date, category.get())) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong");
+        }
+
+        return ResponseEntity.status(status).body("Updated successfully");
     }
 
     @PostMapping("/news")
@@ -121,19 +129,21 @@ public class NewsController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "400", description = "Bad request"),
             @ApiResponse(responseCode = "404", description = "Not found")
     })
     public ResponseEntity<?> createNews(@Valid @RequestBody NewsRequest newsRequest) {
-        return saveNews(newsRequest, 0L, HttpStatus.CREATED);
+        return update(newsRequest, 0L, HttpStatus.CREATED);
     }
 
     @PutMapping("/news/{id}")
     @Operation(
             summary = "Update a news",
-            description = "Update a news and get it or get an error if input is invalid or news/category was not found"
+            description = "Update a news and get its id or get an error if input is invalid or news/category was not found"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "400", description = "Bad request"),
             @ApiResponse(responseCode = "404", description = "Not found")
     })
     public ResponseEntity<?> updateNews(
@@ -143,8 +153,7 @@ public class NewsController {
         if (news.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("News not found");
         }
-
-        return saveNews(newsRequest, id, HttpStatus.OK);
+        return update(newsRequest, id, HttpStatus.OK);
     }
 
     @DeleteMapping("/news/{id}")
@@ -162,9 +171,8 @@ public class NewsController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("News not found");
         }
 
-        newsService.deleteNews(news.get());
-        if (newsService.exists(id)) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unexpected error");
+        if (!newsService.deleteNews(news.get())) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong");
         }
 
         return ResponseEntity.status(HttpStatus.OK).body("Deleted successfully");
