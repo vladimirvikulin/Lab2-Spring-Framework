@@ -134,9 +134,11 @@ public class CategoryController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Category not found");
         }
 
-        if (!categoryService.deleteCategory(category.get())) {
+        categoryService.deleteCategory(category.get());
+        if (categoryService.getCategoryById(id).isPresent()) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong");
         }
+
         return ResponseEntity.status(HttpStatus.OK).body("Deleted successfully");
     }
 }
