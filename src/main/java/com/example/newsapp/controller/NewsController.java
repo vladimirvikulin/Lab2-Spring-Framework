@@ -171,7 +171,8 @@ public class NewsController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("News not found");
         }
 
-        if (!newsService.deleteNews(news.get())) {
+        newsService.deleteNews(news.get());
+        if (newsService.getNewsById(id).isPresent()) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong");
         }
 
