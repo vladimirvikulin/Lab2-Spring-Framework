@@ -4,7 +4,6 @@ import com.example.newsapp.model.Category;
 import com.example.newsapp.model.News;
 import com.example.newsapp.repository.NewsRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -60,7 +59,6 @@ public class NewsService {
         return newsRepository.save(news).getId();
     }
 
-    @Transactional
     public boolean updateNews(Long id, String title, String content, LocalDate date, Category category) {
         return newsRepository.update(title, content, date, category.getId(), id) > 0;
     }
